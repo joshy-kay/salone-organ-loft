@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Salone Organ Loft</title>
+<meta name="description" content="Free hymn and organ scores, a meter-based tune finder and a directory of organists in Sierra Leone.">
+<meta name="theme-color" content="#1F5B4F">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Organ Loft">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a hymnal's metrical index brought to the screen — one narrow reading column, tabs as section tabs, meters set in their own figure column. */
+:root{
+  --paper:#F2F3EF; --leaf:#FBFBF8; --ink:#1C2320; --muted:#5D6862; --rule:#D5D9D2;
+  --cloth:#1F5B4F; --cloth-ink:#FFFFFF; --gilt:#8A6620; --flag:#A2412F; --tint:#E3EBE6;
+  --sl-green:#1EB53A; --sl-white:#FFFFFF; --sl-blue:#0072C6;
+  --display:"IM Fell English SC","Iowan Old Style",Georgia,serif;
+  --serif:"IM Fell English","Iowan Old Style",Georgia,serif;
+  --body:"Alegreya Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141917; --leaf:#1B211F; --ink:#E6EAE5; --muted:#9AA59F; --rule:#2E3733;
+  --cloth:#6FB3A2; --cloth-ink:#0E1513; --gilt:#D2AE62; --flag:#E58B76; --tint:#22302B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141917; --leaf:#1B211F; --ink:#E6EAE5; --muted:#9AA59F; --rule:#2E3733;
+  --cloth:#6FB3A2; --cloth-ink:#0E1513; --gilt:#D2AE62; --flag:#E58B76; --tint:#22302B; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:18px;padding-block:28px 64px}
+header h1{font:400 clamp(2rem,6vw,3rem)/1.05 var(--display);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:.5rem 0 0;color:var(--muted);max-width:60ch}
+.flagbar{display:flex;width:132px;height:6px;margin:12px 0 4px;border-radius:2px;overflow:hidden;border:1px solid var(--rule)}
+.flagbar span{flex:1}
+.flagbar span:nth-child(1){background:var(--sl-green)}
+.flagbar span:nth-child(2){background:var(--sl-white)}
+.flagbar span:nth-child(3){background:var(--sl-blue)}
+header .rubric{font:500 .78rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gilt);margin-bottom:.4rem}
+nav{display:flex;gap:4px;margin:26px 0 0;border-bottom:2px solid var(--cloth);flex-wrap:wrap}
+nav button{font:500 .95rem var(--body);border:1px solid var(--rule);border-bottom:none;background:var(--leaf);color:var(--muted);padding:9px 16px;border-radius:6px 6px 0 0;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--cloth);border-color:var(--cloth);color:var(--cloth-ink)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
+section.panel{padding-top:22px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=text],input[type=url],input[type=search],select,textarea{font:16px var(--body);color:var(--ink);background:var(--leaf);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;width:100%}
+textarea{font:1.08rem/1.6 var(--serif);min-height:150px;resize:vertical}
+.bar input[type=search]{flex:1 1 260px;width:auto}
+.bar select{flex:0 1 220px;width:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:500 .85rem var(--body);border:1px solid var(--rule);background:var(--leaf);color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--tint);border-color:var(--cloth);color:var(--cloth)}
+.count{color:var(--muted);font-size:.9rem;margin:14px 0 6px}
+.list{border-top:1px solid var(--rule)}
+.row{border-bottom:1px solid var(--rule)}
+.row>button.head{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;width:100%;padding:12px 4px}
+.row>button.head:focus-visible{outline:2px solid var(--gilt)}
+.row>button.head:hover .tn{color:var(--cloth)}
+.tn{font:400 1.15rem/1.25 var(--display);letter-spacing:.02em}
+.fl{font:italic 1rem/1.4 var(--serif);color:var(--ink);opacity:.85;min-width:0}
+.by{font-size:.86rem;color:var(--muted)}
+.mtr{font:500 .9rem var(--mono);color:var(--gilt);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font:500 .72rem var(--body);letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--tint);color:var(--cloth);margin-left:6px;vertical-align:2px}
+.pill.flag{color:var(--flag);background:transparent;border:1px solid var(--flag)}
+.detail{padding:4px 4px 18px;display:grid;gap:14px}
+.detail h3{font:500 .78rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.score{background:var(--leaf);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;gap:6px}
+.score .t{font-weight:700}
+.score .meta{font-size:.88rem;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+a.open,button.btn{font:500 .9rem var(--body);display:inline-block;padding:7px 14px;border-radius:6px;text-decoration:none;cursor:pointer;border:1px solid var(--cloth);background:var(--cloth);color:var(--cloth-ink)}
+button.btn.ghost{background:transparent;color:var(--cloth)}
+button.btn.warn{background:transparent;color:var(--flag);border-color:var(--flag)}
+button.link{all:unset;cursor:pointer;color:var(--cloth);font-size:.88rem;text-decoration:underline;text-underline-offset:3px}
+.empty{background:var(--leaf);border:1px dashed var(--rule);border-radius:8px;padding:14px 16px;color:var(--muted);font-size:.95rem}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+@media (max-width:720px){.two{grid-template-columns:minmax(0,1fr)}}
+.lines{border-top:1px solid var(--rule);margin-top:6px}
+.ln{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--rule)}
+.ln .txt{font:italic .98rem/1.35 var(--serif);min-width:0;overflow-wrap:anywhere}
+.adj{display:flex;align-items:center;gap:4px}
+.adj button{width:28px;height:28px;border:1px solid var(--rule);background:var(--leaf);color:var(--ink);border-radius:5px;cursor:pointer;font:500 1rem var(--mono)}
+.adj b{font:500 1.05rem var(--mono);color:var(--gilt);min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
+.adj b.edited{text-decoration:underline dotted}
+.verdict{background:var(--leaf);border:1px solid var(--rule);border-left:4px solid var(--gilt);border-radius:6px;padding:14px 16px}
+.verdict .big{font:500 1.5rem var(--mono);color:var(--gilt);font-variant-numeric:tabular-nums}
+.verdict .name{font:1.1rem var(--serif)}
+.note{font-size:.88rem;color:var(--muted)}
+.sub{font:400 1.3rem var(--display);margin:22px 0 4px}
+form{display:grid;gap:14px}
+label{display:grid;gap:4px;font-weight:500;font-size:.92rem}
+label span.h{font-weight:400;color:var(--muted);font-size:.84rem}
+fieldset{border:1px solid var(--rule);border-radius:8px;padding:10px 14px;display:grid;gap:6px}
+legend{font-weight:500;font-size:.92rem;padding:0 4px}
+.radio{display:flex;gap:8px;align-items:flex-start;font-weight:400}
+.radio input{margin-top:4px}
+.msg{padding:10px 14px;border-radius:6px;font-size:.92rem}
+.msg.ok{background:var(--tint);color:var(--cloth)}
+.msg.err{border:1px solid var(--flag);color:var(--flag)}
+.banner{margin:14px 0 0;padding:10px 14px;border-radius:6px;border:1px solid var(--flag);color:var(--flag);font-size:.92rem}
+.banner.info{border-color:var(--cloth);color:var(--cloth);background:var(--tint)}
+.adminbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.adminbar input{max-width:200px}
+.foot{margin-top:40px;color:var(--muted);font-size:.84rem;max-width:65ch}
+.olist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.org{background:var(--leaf);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:grid;gap:8px;align-content:start;min-width:0}
+.org .on{font:400 1.3rem/1.2 var(--display);letter-spacing:.02em}
+.org .ch{font:italic 1.02rem/1.35 var(--serif)}
+.org .meta{font-size:.88rem;color:var(--muted)}
+.lbl{font:500 .72rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.dates{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.dt{font:500 .8rem var(--mono);padding:2px 8px;border-radius:4px;background:var(--tint);color:var(--cloth)}
+.dt.sel{background:var(--cloth);color:var(--cloth-ink)}
+.onote{font-size:.92rem;border-left:2px solid var(--rule);padding-left:10px}
+.contact{border-top:1px solid var(--rule);padding-top:10px;display:grid;gap:6px}
+.contact a.open{justify-self:start}
+.cline{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.cline .lbl{min-width:4.5em}
+.cline .val{font:500 .98rem var(--mono);user-select:all;overflow-wrap:anywhere;min-width:0}
+.checks{display:flex;gap:6px 16px;flex-wrap:wrap}
+.checks label{display:flex;gap:6px;align-items:center;font-weight:400}
+.formhead{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;justify-content:space-between}
+@media (prefers-reduced-motion:no-preference){.detail{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(-3px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="rubric">For organists in Sierra Leone</div>
+  <h1>Salone Organ Loft</h1>
+  <div class="flagbar" aria-hidden="true"><span></span><span></span><span></span></div>
+  <p>Find a hymn tune, see every other tune that fits the same words, share the scores you hold, and find an organist to cover a Sunday.</p>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+<div id="installTip" class="banner info" hidden></div>
+<nav role="tablist" aria-label="Sections">
+  <button role="tab" id="tab-lib" aria-selected="true" data-tab="lib">Library</button>
+  <button role="tab" id="tab-meter" aria-selected="false" data-tab="meter">Find tunes by meter</button>
+  <button role="tab" id="tab-org" aria-selected="false" data-tab="org">Organists</button>
+  <button role="tab" id="tab-add" aria-selected="false" data-tab="add">Add a score</button>
+</nav>
+
+<section class="panel" id="p-lib" role="tabpanel" aria-labelledby="tab-lib">
+  <div class="bar">
+    <input type="search" id="q" placeholder="Tune, first line, composer, hymnal or meter (e.g. 8.7.8.7)" aria-label="Search the library">
+    <select id="fm" aria-label="Filter by meter"></select>
+  </div>
+  <div class="chips" style="margin-top:10px" role="group" aria-label="Show">
+    <button class="chip" data-show="all" aria-pressed="true">Everything</button>
+    <button class="chip" data-show="scores" aria-pressed="false">Has a score to download</button>
+    <button class="chip" data-show="Hymn" aria-pressed="false">Hymns</button>
+    <button class="chip" data-show="Voluntary" aria-pressed="false">Voluntaries</button>
+    <button class="chip" data-show="March" aria-pressed="false">Marches</button>
+  </div>
+  <div class="count" id="cnt"></div>
+  <div class="list" id="list"></div>
+</section>
+
+<section class="panel" id="p-meter" role="tabpanel" aria-labelledby="tab-meter" hidden>
+  <div class="two">
+    <div>
+      <label for="words">Paste one stanza of the hymn
+        <span class="h">One line of verse per line. Leave out refrains and Alleluias.</span>
+      </label>
+      <textarea id="words" style="margin-top:6px">O God, our help in ages past,
+Our hope for years to come,
+Our shelter from the stormy blast,
+And our eternal home.</textarea>
+      <div style="margin-top:12px">
+        <label for="mtype">Or type a meter
+          <span class="h">8.7.8.7, 87 87 D, CM, LM, SM, 11.11.11.11 …</span>
+        </label>
+        <input type="text" id="mtype" style="margin-top:6px" autocomplete="off">
+      </div>
+    </div>
+    <div>
+      <div class="verdict" id="verdict"></div>
+      <div class="lines" id="lines"></div>
+      <p class="note">Syllables are counted by rule, so check each line. Use − and + where a word is sung differently, such as “heav’n” as one syllable.</p>
+    </div>
+  </div>
+  <div id="matches"></div>
+</section>
+
+<section class="panel" id="p-org" role="tabpanel" aria-labelledby="tab-org" hidden>
+  <div class="bar">
+    <input type="search" id="oq" placeholder="Organist, church, town or denomination" aria-label="Search organists">
+  </div>
+  <div style="margin-top:12px">
+    <div class="lbl" style="margin-bottom:6px">Free to play on</div>
+    <div class="chips" id="sundays" role="group" aria-label="Filter by Sunday"></div>
+  </div>
+  <div class="count" id="ocnt"></div>
+  <div class="olist" id="olist"></div>
+
+  <div class="formhead"><h2 class="sub" id="me-h">Your listing</h2>
+    <div class="chips" id="omode" role="group" aria-label="Whose listing" hidden>
+      <button type="button" class="chip" data-omode="self" aria-pressed="true">Your own listing</button>
+      <button type="button" class="chip" data-omode="other" aria-pressed="false">Add another organist</button>
+    </div>
+  </div>
+  <div id="orgGate"></div>
+  <form id="orgForm" novalidate hidden>
+    <div class="two">
+      <label for="o-name">Full name<input type="text" id="o-name" autocomplete="name"></label>
+      <label for="o-town">Town or area<span class="h">Town, district or neighbourhood</span><input type="text" id="o-town"></label>
+      <label for="o-phone">Phone<span class="h">Include the country code, e.g. +232, so others can call or WhatsApp</span><input type="text" id="o-phone" inputmode="tel" autocomplete="tel"></label>
+      <label for="o-email">Email<span class="h">Optional</span><input type="text" id="o-email" inputmode="email" autocomplete="email"></label>
+      <label for="o-churches">Church or churches where you play<span class="h">Separate several churches with commas</span><input type="text" id="o-churches"></label>
+      <label for="o-denom">Denomination<span class="h">Optional</span><input type="text" id="o-denom"></label>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox" id="o-wa"> This number is on WhatsApp</label>
+    </div>
+    <fieldset>
+      <legend>Plays</legend>
+      <div class="checks" id="o-plays">
+        <label><input type="checkbox" value="Pipe organ"> Pipe organ</label>
+        <label><input type="checkbox" value="Electronic organ"> Electronic organ</label>
+        <label><input type="checkbox" value="Piano"> Piano</label>
+        <label><input type="checkbox" value="Keyboard"> Keyboard</label>
+      </div>
+    </fieldset>
+    <label for="o-note">Note for other organists<span class="h">Optional. e.g. “Available for weddings and funerals too” or “Morning services only”</span><input type="text" id="o-note" maxlength="200"></label>
+    <div>
+      <div class="lbl" style="margin-bottom:6px" id="avail-l">Sundays free to cover</div>
+      <div class="chips" id="oavail" role="group" aria-labelledby="avail-l"></div>
+    </div>
+    <label class="radio"><input type="checkbox" id="o-consent"> <span id="consent-t">I agree to show my name, churches and contact details to everyone who can open this page.</span></label>
+    <div class="msg" id="oMsg" hidden></div>
+    <div class="actions"><button class="btn" type="submit" id="o-submit">Save listing</button></div>
+  </form>
+</section>
+
+<section class="panel" id="p-add" role="tabpanel" aria-labelledby="tab-add" hidden>
+  <div id="addGate"></div>
+  <form id="addForm" novalidate hidden>
+    <div class="two">
+      <label for="f-title">Title<span class="h">Hymn title or the name of the piece</span><input type="text" id="f-title" required></label>
+      <label for="f-kind">Kind of score
+        <select id="f-kind"><option>Hymn</option><option>Voluntary</option><option>March</option><option>Descant or reharmonization</option><option>Service music</option><option>Anthem</option></select>
+      </label>
+      <label for="f-first">First line<input type="text" id="f-first"></label>
+      <label for="f-tune">Tune name<span class="h">As printed above the music, e.g. Hyfrydol</span><input type="text" id="f-tune" list="tunelist" autocomplete="off"></label>
+      <label for="f-comp">Composer or arranger<input type="text" id="f-comp"></label>
+      <label for="f-meter">Meter<span class="h">e.g. 8.7.8.7.D or CM. Leave blank if unsure.</span><input type="text" id="f-meter" autocomplete="off"></label>
+      <label for="f-key">Key<input type="text" id="f-key" placeholder="e.g. F major"></label>
+      <label for="f-hymnal">Source hymnal and number<input type="text" id="f-hymnal" placeholder="e.g. Hymns Ancient &amp; Modern 165"></label>
+    </div>
+    <label for="f-link">Link to the file<span class="h">A public link to the PDF or photo, from Google Drive, Dropbox, OneDrive or similar. Set it so anyone with the link can view.</span><input type="url" id="f-link" placeholder="https://" required></label>
+    <fieldset>
+      <legend>Who owns the rights to this score?</legend>
+      <label class="radio"><input type="radio" name="rights" value="Public domain"> Public domain (old enough that copyright has expired)</label>
+      <label class="radio"><input type="radio" name="rights" value="My own work"> My own work (I wrote or arranged it)</label>
+      <label class="radio"><input type="radio" name="rights" value="Shared with permission"> I have permission from the copyright holder to share it</label>
+    </fieldset>
+    <div class="msg" id="formMsg" hidden></div>
+    <div class="actions"><button class="btn" type="submit" id="f-submit">Add to the library</button></div>
+  </form>
+  <datalist id="tunelist"></datalist>
+</section>
+
+<p class="foot">The tune index lists well-known public-domain hymn tunes with their usual meters and dates; check details against your own hymnal. Shared scores are added by organists. Report any file that looks wrong or that its uploader may not have the right to share.</p>
+<div class="foot" style="margin-top:12px">
+  <button class="link" id="adminToggle" type="button">Admin</button>
+  <div class="adminbar" id="adminBar" hidden>
+    <input type="password" id="adminPin" placeholder="Admin PIN" aria-label="Admin PIN" autocomplete="current-password">
+    <button class="btn" type="button" id="adminGo">Turn on admin</button>
+    <span class="note" id="adminMsg"></span>
+  </div>
+</div>
+</div>
+
+<script>
+// ENGINE START
+const NAMED={"8.6.8.6":"CM","8.8.8.8":"LM","6.6.8.6":"SM"};
+const NAMEFULL={CM:"Common Meter",LM:"Long Meter",SM:"Short Meter",CMD:"Common Meter Double",LMD:"Long Meter Double",SMD:"Short Meter Double"};
+const EXC={alleluia:4,alleluya:4,hallelujah:4,creation:4,create:2,created:3,creator:3,creature:2,creatures:2,messiah:3,israel:3,jehovah:3,every:2,poem:2,idea:3,real:1,area:3,beauteous:3,glorious:2,orient:3,quiet:2,science:2,video:3};
+function syl(word){
+  const raw=word.toLowerCase().replace(/[\u2019`]/g,"'");
+  const poss=/(ch|sh|[sxz]|ge|ce)'s$/.test(raw.replace(/[^a-z']/g,""))?1:0;
+  let w=raw.replace(/[^a-z]/g,"");
+  if(!w) return 0;
+  if(poss) return syl(w.slice(0,-1))+1;
+  if(EXC[w]) return EXC[w];
+  if(w.length<=3) return 1;
+  let extra=0;
+  if(/[aeiouy]ing$/.test(w)) extra++;
+  if(/[^tscxg]io/.test(w)) extra++;
+  if(/[^tscgs]ia/.test(w)) extra++;
+  if(/ed$/.test(w) && !/[td]ed$/.test(w)) w=w.slice(0,-2);
+  else if(/es$/.test(w) && !/([sxzcg]|ch|sh)es$/.test(w)) w=w.slice(0,-2);
+  else if(/e$/.test(w) && !/[^aeiouy]le$/.test(w)) w=w.slice(0,-1);
+  w=w.replace(/([^aeiou])e(ly|ful|ness|ment|less)$/,"$1$2");
+  w=w.replace(/^y/,"");
+  const m=w.match(/[aeiouy]+/g);
+  return Math.max(1,(m?m.length:0)+extra);
+}
+function lineSyl(line){return line.split(/[\s\-—–]+/).reduce((a,w)=>a+syl(w),0)}
+function expand(m){
+  const s=String(m).trim().toUpperCase().replace(/\s+/g," ");
+  const named=s.match(/^(CM|LM|SM)\s*(D)?$|^(C|L|S)MD$/);
+  if(named){const base=(named[1]||named[3]+"M");const arr={CM:[8,6,8,6],LM:[8,8,8,8],SM:[6,6,8,6]}[base];return (named[2]||named[3])?arr.concat(arr):arr.slice()}
+  const dbl=/\bD\b|\.D$|DOUBLE/.test(s);
+  const core=s.replace(/DOUBLE|\bD\b|\.D$|WITH.*$|\(.*\)/g," ");
+  let toks=core.includes(".")?core.split(/[^0-9]+/):core.split(/[^0-9]+/);
+  toks=toks.filter(Boolean);
+  let nums=[];
+  for(const t of toks){
+    if(core.includes(".")||t.length===1||/^1[0-4]$/.test(t)) nums.push(+t);
+    else nums.push(...t.split("").map(Number));
+  }
+  nums=nums.filter(n=>n>0&&n<20);
+  if(!nums.length) return null;
+  return dbl?nums.concat(nums):nums;
+}
+function label(arr){
+  if(!arr||!arr.length) return "";
+  const k=arr.join(".");
+  if(NAMED[k]) return k+" ("+NAMED[k]+")";
+  const h=arr.length/2;
+  if(arr.length%2===0&&arr.length>=8&&arr.slice(0,h).join(".")===arr.slice(h).join(".")){
+    const hk=arr.slice(0,h).join(".");
+    return hk+".D"+(NAMED[hk]?" ("+NAMED[hk]+"D)":"");
+  }
+  return k;
+}
+function shortName(arr){
+  if(!arr) return "";
+  const k=arr.join(".");if(NAMED[k]) return NAMEFULL[NAMED[k]];
+  const h=arr.length/2;
+  if(arr.length%2===0&&arr.slice(0,h).join(".")===arr.slice(h).join(".")&&NAMED[arr.slice(0,h).join(".")]) return NAMEFULL[NAMED[arr.slice(0,h).join(".")]+"D"];
+  return "";
+}
+// ENGINE END
+
+// Starter metrical index: [tune, meter, composer or source, first line of a text it is often sung to, note]
+const INDEX=[
+["ST ANNE","CM","William Croft, 1708","O God, our help in ages past"],
+["AZMON","CM","Carl G. Gläser, arr. Lowell Mason, 1839","O for a thousand tongues to sing"],
+["NEW BRITAIN","CM","American folk melody, 1829","Amazing grace! how sweet the sound"],
+["DUNDEE","CM","Scottish Psalter, 1615","Let saints on earth in concert sing"],
+["ST AGNES","CM","John B. Dykes, 1866","Jesus, the very thought of thee"],
+["CRIMOND","CM","Jessie S. Irvine, 1872","The Lord's my shepherd, I'll not want"],
+["MARTYRDOM","CM","Hugh Wilson, c.1800","Alas! and did my Saviour bleed"],
+["ST PETER","CM","Alexander R. Reinagle, 1836","How sweet the name of Jesus sounds"],
+["WINCHESTER OLD","CM","Este's Psalter, 1592","While shepherds watched their flocks by night"],
+["ST MAGNUS","CM","Jeremiah Clarke, 1707","The head that once was crowned with thorns"],
+["RICHMOND","CM","Thomas Haweis, 1792","City of God, how broad and far"],
+["ARLINGTON","CM","Thomas A. Arne, 1762","Am I a soldier of the cross"],
+["BELMONT","CM","William Gardiner, 1812",""],
+["BALERMA","CM","adapt. Robert Simpson, 1833",""],
+["ANTIOCH","CM","arr. Lowell Mason, 1839","Joy to the world! the Lord is come","with repeats"],
+["OLD HUNDREDTH","LM","Louis Bourgeois, Genevan Psalter, 1551","All people that on earth do dwell"],
+["DUKE STREET","LM","John Hatton, 1793","Jesus shall reign where'er the sun"],
+["TALLIS' CANON","LM","Thomas Tallis, c.1561","Glory to thee, my God, this night"],
+["ROCKINGHAM","LM","adapt. Edward Miller, 1790","When I survey the wondrous cross"],
+["HAMBURG","LM","Lowell Mason, 1824","When I survey the wondrous cross"],
+["WAREHAM","LM","William Knapp, 1738",""],
+["TRURO","LM","Psalmodia Evangelica, 1789","Lift up your heads, ye mighty gates"],
+["GERMANY","LM","William Gardiner, 1815","Where cross the crowded ways of life"],
+["WINCHESTER NEW","LM","Musikalisches Handbuch, 1690","On Jordan's bank the Baptist's cry"],
+["ANGELUS","LM","Georg Joseph, 1657","At even, ere the sun was set"],
+["MARYTON","LM","H. Percy Smith, 1874","O Master, let me walk with thee"],
+["ST THOMAS (WILLIAMS)","SM","Aaron Williams, 1763","I love thy kingdom, Lord"],
+["DENNIS","SM","Hans G. Nägeli, arr. Lowell Mason, 1845","Blest be the tie that binds"],
+["FRANCONIA","SM","J. B. König, 1738, adapt. W. H. Havergal","Blest are the pure in heart"],
+["SOUTHWELL","SM","Damon's Psalter, 1579","Lord Jesus, think on me"],
+["CARLISLE","SM","Charles Lockhart, 1769","Breathe on me, Breath of God"],
+["BOYLSTON","SM","Lowell Mason, 1832","A charge to keep I have"],
+["KINGSFOLD","CMD","English traditional melody","I heard the voice of Jesus say"],
+["CAROL","CMD","Richard S. Willis, 1850","It came upon the midnight clear"],
+["FOREST GREEN","CMD","English traditional melody","O little town of Bethlehem"],
+["MATERNA","CMD","Samuel A. Ward, 1882","O beautiful for spacious skies"],
+["ALL SAINTS NEW","CMD","Henry S. Cutler, 1872","The Son of God goes forth to war"],
+["ELLACOMBE","CMD","Württemberg Gesangbuch, 1784","I sing the almighty power of God"],
+["CREATION","LMD","Franz Joseph Haydn, 1798","The spacious firmament on high"],
+["JERUSALEM","LMD","C. Hubert H. Parry, 1916","And did those feet in ancient time"],
+["STUTTGART","8.7.8.7","Christian F. Witt, 1715","Come, thou long-expected Jesus","trochaic"],
+["MERTON","8.7.8.7","William H. Monk, 1850","Hark! a thrilling voice is sounding","trochaic"],
+["ST COLUMBA","8.7.8.7","Irish traditional melody","The King of love my shepherd is","iambic"],
+["DOMINUS REGIT ME","8.7.8.7","John B. Dykes, 1868","The King of love my shepherd is","iambic"],
+["GALILEE","8.7.8.7","William H. Jude, 1887","Jesus calls us; o'er the tumult","trochaic"],
+["CROSS OF JESUS","8.7.8.7","John Stainer, 1887","Cross of Jesus, cross of sorrow","trochaic"],
+["LAUS DEO (REDHEAD NO. 46)","8.7.8.7","Richard Redhead, 1853","Bright the vision that delighted","trochaic"],
+["HYFRYDOL","8.7.8.7.D","Rowland H. Prichard, 1830","Alleluia! sing to Jesus","trochaic"],
+["BEACH SPRING","8.7.8.7.D","The Sacred Harp, 1844","","trochaic"],
+["NETTLETON","8.7.8.7.D","Wyeth's Repository, 1813","Come, thou fount of every blessing","trochaic"],
+["AUSTRIA","8.7.8.7.D","Franz Joseph Haydn, 1797","Glorious things of thee are spoken","trochaic"],
+["HYMN TO JOY","8.7.8.7.D","Ludwig van Beethoven, 1824, arr. Edward Hodges","Joyful, joyful, we adore thee","trochaic"],
+["BLAENWERN","8.7.8.7.D","William P. Rowlands, 1905","Love divine, all loves excelling","trochaic"],
+["BEECHER","8.7.8.7.D","John Zundel, 1870","Love divine, all loves excelling","trochaic"],
+["EBENEZER (TON-Y-BOTEL)","8.7.8.7.D","Thomas J. Williams, 1890","O the deep, deep love of Jesus","trochaic"],
+["RUSTINGTON","8.7.8.7.D","C. Hubert H. Parry, 1897","","trochaic"],
+["CONVERSE","8.7.8.7.D","Charles C. Converse, 1868","What a friend we have in Jesus","trochaic"],
+["PLEADING SAVIOR","8.7.8.7.D","Plymouth Collection, 1855","","trochaic"],
+["REGENT SQUARE","8.7.8.7.8.7","Henry Smart, 1867","Angels from the realms of glory"],
+["PICARDY","8.7.8.7.8.7","French carol, 17th century","Let all mortal flesh keep silence"],
+["CWM RHONDDA","8.7.8.7.8.7","John Hughes, 1907","Guide me, O thou great Jehovah","last line repeated"],
+["WESTMINSTER ABBEY","8.7.8.7.8.7","adapt. from Henry Purcell","Christ is made the sure foundation"],
+["LAUDA ANIMA","8.7.8.7.8.7","John Goss, 1869","Praise, my soul, the King of heaven"],
+["ST THOMAS (WADE)","8.7.8.7.8.7","John F. Wade, 1751","Tantum ergo"],
+["MANNHEIM","8.7.8.7.8.7","Friedrich Filitz, 1847","Lead us, heavenly Father, lead us"],
+["IRBY","8.7.8.7.7.7","Henry J. Gauntlett, 1849","Once in royal David's city"],
+["MIT FREUDEN ZART","8.7.8.7.8.8.7","Bohemian Brethren, 1566","Sing praise to God who reigns above"],
+["AURELIA","7.6.7.6.D","Samuel S. Wesley, 1864","The church's one foundation"],
+["LANCASHIRE","7.6.7.6.D","Henry Smart, 1835","Lead on, O King eternal"],
+["PASSION CHORALE","7.6.7.6.D","Hans Leo Hassler, 1601, harm. J. S. Bach","O sacred head, sore wounded"],
+["WEBB","7.6.7.6.D","George J. Webb, 1830","Stand up, stand up for Jesus"],
+["MUNICH","7.6.7.6.D","Meiningen Gesangbuch, 1693","O Word of God incarnate"],
+["EWING","7.6.7.6.D","Alexander Ewing, 1853","Jerusalem the golden"],
+["ST KEVIN","7.6.7.6.D","Arthur S. Sullivan, 1872","Come, ye faithful, raise the strain"],
+["CRÜGER","7.6.7.6.D","Johann Crüger, 1640","Hail to the Lord's anointed"],
+["MISSIONARY HYMN","7.6.7.6.D","Lowell Mason, 1823","From Greenland's icy mountains"],
+["ST THEODULPH","7.6.7.6.D","Melchior Teschner, 1615","All glory, laud and honour","with refrain"],
+["ELLACOMBE","7.6.7.6.D","Württemberg Gesangbuch, 1784","The day of resurrection"],
+["MONKLAND","7.7.7.7","John Antes, arr. John B. Wilkes, 1861","Let us, with a gladsome mind"],
+["UNIVERSITY COLLEGE","7.7.7.7","Henry J. Gauntlett, 1852","Oft in danger, oft in woe"],
+["HEINLEIN","7.7.7.7","Nürnbergisches Gesangbuch, 1676","Forty days and forty nights"],
+["INNOCENTS","7.7.7.7","The Parish Choir, 1850",""],
+["SAVANNAH","7.7.7.7","Foundery Collection, 1742","Love's redeeming work is done"],
+["EASTER HYMN","7.7.7.7","Lyra Davidica, 1708","Jesus Christ is risen today","with Alleluias"],
+["LLANFAIR","7.7.7.7","Robert Williams, 1817","Hail the day that sees him rise","with Alleluias"],
+["ST GEORGE'S WINDSOR","7.7.7.7.D","George J. Elvey, 1858","Come, ye thankful people, come"],
+["ABERYSTWYTH","7.7.7.7.D","Joseph Parry, 1879","Jesu, lover of my soul"],
+["MARTYN","7.7.7.7.D","Simeon B. Marsh, 1834","Jesus, lover of my soul"],
+["SALZBURG","7.7.7.7.D","Jakob Hintze, 1678","Songs of thankfulness and praise"],
+["MENDELSSOHN","7.7.7.7.D","Felix Mendelssohn, 1840, adapt. W. H. Cummings","Hark! the herald angels sing","with refrain"],
+["DIX","7.7.7.7.7.7","Conrad Kocher, 1838, adapt. W. H. Monk","As with gladness men of old"],
+["TOPLADY","7.7.7.7.7.7","Thomas Hastings, 1830","Rock of ages, cleft for me"],
+["PETRA (REDHEAD NO. 76)","7.7.7.7.7.7","Richard Redhead, 1853","Rock of ages, cleft for me"],
+["RATISBON","7.7.7.7.7.7","Werner's Choralbuch, 1815","Christ, whose glory fills the skies"],
+["EVENTIDE","10.10.10.10","William H. Monk, 1861","Abide with me; fast falls the eventide"],
+["MORECAMBE","10.10.10.10","Frederick C. Atkinson, 1870","Spirit of God, descend upon my heart"],
+["ELLERS","10.10.10.10","Edward J. Hopkins, 1869","Saviour, again to thy dear name we raise"],
+["YORKSHIRE","10.10.10.10.10.10","John Wainwright, 1750","Christians, awake, salute the happy morn"],
+["ST DENIO","11.11.11.11","Welsh melody, 1839","Immortal, invisible, God only wise"],
+["FOUNDATION","11.11.11.11","Funk's Compilation, 1832","How firm a foundation, ye saints of the Lord"],
+["GORDON","11.11.11.11","Adoniram J. Gordon, 1876","My Jesus, I love thee, I know thou art mine"],
+["CRADLE SONG","11.11.11.11","William J. Kirkpatrick, 1895","Away in a manger, no crib for a bed"],
+["MUELLER","11.11.11.11","James R. Murray, 1887","Away in a manger, no crib for a bed"],
+["HANOVER","10.10.11.11","attr. William Croft, 1708","O worship the King, all glorious above"],
+["LAUDATE DOMINUM","10.10.11.11","C. Hubert H. Parry, 1894","O praise ye the Lord! praise him in the height"],
+["NICAEA","11.12.12.10","John B. Dykes, 1861","Holy, holy, holy! Lord God Almighty"],
+["MELITA","8.8.8.8.8.8","John B. Dykes, 1861","Eternal Father, strong to save"],
+["ST CATHERINE","8.8.8.8.8.8","Henri F. Hemy, 1864","Faith of our fathers","with refrain"],
+["VATER UNSER","8.8.8.8.8.8","Geistliche Lieder, 1539",""],
+["DARWALL'S 148TH","6.6.6.6.8.8","John Darwall, 1770","Rejoice, the Lord is King"],
+["BETHANY","6.4.6.4.6.6.6.4","Lowell Mason, 1856","Nearer, my God, to thee"],
+["ITALIAN HYMN","6.6.4.6.6.6.4","Felice de Giardini, 1769","Come, thou almighty King"],
+["OLIVET","6.6.4.6.6.6.4","Lowell Mason, 1832","My faith looks up to thee"],
+["NATIONAL ANTHEM","6.6.4.6.6.6.4","Thesaurus Musicus, 1744",""],
+["EUDOXIA","6.5.6.5","Sabine Baring-Gould, 1865","Now the day is over"],
+["CASWALL","6.5.6.5","Friedrich Filitz, 1847","Glory be to Jesus"],
+["ST GERTRUDE","6.5.6.5.D","Arthur S. Sullivan, 1871","Onward, Christian soldiers","with refrain"],
+["NUN DANKET","6.7.6.7.6.6.6.6","Johann Crüger, 1647","Now thank we all our God"],
+["EIN FESTE BURG","8.7.8.7.6.6.6.6.7","Martin Luther, 1529","A mighty fortress is our God"],
+["LOBE DEN HERREN","14.14.4.7.8","Stralsund Gesangbuch, 1665","Praise to the Lord, the Almighty"],
+["SANDON","10.4.10.4.10.10","Charles H. Purday, 1860","Lead, kindly Light"],
+["LUX BENIGNA","10.4.10.4.10.10","John B. Dykes, 1865","Lead, kindly Light"],
+["ST CLEMENT","9.8.9.8","Clement C. Scholefield, 1874","The day thou gavest, Lord, is ended"],
+["VICTORY","8.8.8","G. P. da Palestrina, adapt. W. H. Monk, 1861","The strife is o'er, the battle done","with Alleluias"],
+["ADESTE FIDELES","Irregular","John F. Wade, c.1751","O come, all ye faithful","with refrain"],
+["STILLE NACHT","Irregular","Franz X. Gruber, 1818","Silent night, holy night"]
+].map((r,i)=>{
+  const arr=r[1]==="Irregular"?null:expand(r[1]);
+  return {id:"t"+i,name:r[0],arr,key:arr?arr.join("."):"irr",meter:arr?label(arr):"Irregular",by:r[2],text:r[3],note:(r[4]==="trochaic"||r[4]==="iambic")?"":(r[4]||""),stress:(r[4]==="trochaic"||r[4]==="iambic")?r[4]:""};
+});
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>String(s||"").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Z0-9]/g,"");
+
+let SCORES=[];let ME=null;let OWNER=false;let DB=null;let CANWRITE=null;
+let showOnly="all";let openId=null;let confirmDel=null;
+
+/* ---------- tabs ---------- */
+function setTab(t){
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
+  ["lib","meter","org","add"].forEach(k=>$("#p-"+k).hidden=k!==t);
+  try{localStorage.setItem("olTab",t)}catch(e){}
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+
+/* ---------- library model ---------- */
+function groups(){
+  const byName=new Map();
+  const out=INDEX.map(t=>({...t,scores:[]}));
+  out.forEach(g=>{const k=norm(g.name.replace(/\(.*\)/,""));if(!byName.has(k))byName.set(k,[]);byName.get(k).push(g);byName.set(norm(g.name),byName.get(k))});
+  const loose=new Map();
+  for(const s of SCORES){
+    const tk=norm(s.tune);
+    let targets=tk?(byName.get(tk)||byName.get(norm(String(s.tune).replace(/\(.*\)/,"")))):null;
+    if(targets&&s.meterKey){const same=targets.filter(g=>g.key===s.meterKey);if(same.length)targets=same}
+    if(targets&&targets.length){targets.forEach(g=>g.scores.push(s));continue}
+    const lk=tk?("tune:"+tk):("score:"+s.id);
+    if(!loose.has(lk)){
+      const arr=s.meterKey?s.meterKey.split(".").map(Number):null;
+      loose.set(lk,{id:"u"+lk,name:(s.tune||s.title).toUpperCase(),arr,key:s.meterKey||"irr",meter:arr?label(arr):(s.meter||""),by:s.composer||"",text:s.firstLine||(s.tune?s.title:""),note:"",stress:"",scores:[],community:true});
+    }
+    loose.get(lk).scores.push(s);
+  }
+  return out.concat([...loose.values()]);
+}
+function hay(g){return [g.name,g.by,g.text,g.meter,g.key,g.note,...g.scores.flatMap(s=>[s.title,s.firstLine,s.composer,s.hymnal,s.kind,s.key,s.notes,s.source])].join(" ").toLowerCase()}
+function meterOptions(){
+  const seen=new Map();
+  groups().forEach(g=>{if(g.arr)seen.set(g.key,(seen.get(g.key)||0)+1)});
+  const opts=[...seen.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  const cur=$("#fm").value;
+  $("#fm").innerHTML='<option value="">All meters</option>'+opts.map(([k,n])=>`<option value="${esc(k)}">${esc(label(k.split(".").map(Number)))} · ${n}</option>`).join("");
+  $("#fm").value=cur;
+  $("#tunelist").innerHTML=INDEX.map(t=>`<option value="${esc(t.name)}">`).join("");
+}
+function sameMeter(g,all){return all.filter(o=>o.key===g.key&&o.id!==g.id&&g.arr)}
+
+function renderList(){
+  const q=$("#q").value.trim().toLowerCase();
+  const fm=$("#fm").value;
+  const all=groups();
+  let rows=all;
+  if(fm) rows=rows.filter(g=>g.key===fm);
+  if(showOnly==="scores") rows=rows.filter(g=>g.scores.length);
+  else if(showOnly!=="all") rows=rows.filter(g=>g.scores.some(s=>(s.kind||"Hymn")===showOnly));
+  if(q){
+    const qMeter=/^[\d.\s]+d?$|^(c|l|s)md?$/i.test(q)?expand(q):null;
+    rows=rows.filter(g=>(qMeter&&g.key===qMeter.join("."))||q.split(/\s+/).every(w=>hay(g).includes(w)));
+  }
+  rows.sort((a,b)=>(b.scores.length>0)-(a.scores.length>0)||a.name.localeCompare(b.name));
+  const sc=rows.reduce((a,g)=>a+g.scores.length,0);
+  $("#cnt").textContent=`${rows.length} tune${rows.length===1?"":"s"}${sc?` · ${sc} shared score${sc===1?"":"s"}`:""}`;
+  if(!rows.length){$("#list").innerHTML=`<div class="empty">Nothing matches that search. Try a tune name, a first line, or a meter such as 8.7.8.7.</div>`;return}
+  $("#list").innerHTML=rows.map(g=>rowHTML(g,all)).join("");
+}
+function rowHTML(g,all){
+  const open=openId===g.id;
+  const tags=(g.scores.length?`<span class="pill">${g.scores.length} score${g.scores.length>1?"s":""}</span>`:"")+(g.community?`<span class="pill">shared</span>`:"");
+  let h=`<div class="row"><button class="head" aria-expanded="${open}" data-open="${esc(g.id)}">
+    <span class="tn">${esc(g.name)}${tags}</span><span class="mtr">${esc(g.meter)}</span>
+    <span class="fl">${g.text?esc(g.text):""}</span><span class="by" style="text-align:right">${g.note?esc(g.note):""}</span>
+    <span class="by" style="grid-column:1/-1">${esc(g.by)}</span></button>`;
+  if(open){
+    const sm=sameMeter(g,all);
+    h+=`<div class="detail">`;
+    h+=`<div><h3>Shared scores</h3>${g.scores.length?g.scores.map(scoreHTML).join(""):`<div class="empty">No score shared for this tune yet. <button class="link" data-addfor="${esc(g.id)}">Add one</button></div>`}</div>`;
+    if(g.arr){
+      h+=`<div><h3>Other tunes in ${esc(g.meter)}${g.stress?` · this tune is ${g.stress}`:""}</h3>`;
+      h+=sm.length?`<div class="chips">${sm.map(o=>`<button class="chip" data-open="${esc(o.id)}" data-jump="1">${esc(o.name)}${o.stress&&g.stress&&o.stress!==g.stress?" · "+o.stress:""}</button>`).join("")}</div>`:`<div class="note">No other tune in the index has this meter yet.</div>`;
+      if(g.stress&&sm.some(o=>o.stress&&o.stress!==g.stress)) h+=`<p class="note">Tunes marked iambic or trochaic stress different syllables. Sing the first line through before you swap.</p>`;
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  }
+  return h+`</div>`;
+}
+function scoreHTML(s){
+  const mine=OWNER||!!ownScores()[s.id];
+  const del=confirmDel===s.id;
+  return `<div class="score">
+    <div class="t">${esc(s.title)} <span class="pill">${esc(s.kind||"Hymn")}</span>${s.reported?`<span class="pill flag">Flagged for review</span>`:""}</div>
+    <div class="meta">${[s.composer,s.key,s.hymnal,s.meter?label(expand(s.meter)||[])||s.meter:""].filter(Boolean).map(esc).join(" · ")}</div>
+    ${s.notes?`<div class="meta">${esc(s.notes)}</div>`:""}
+    <div class="meta">Rights: ${esc(s.rights)}${s.source?` · Source: ${esc(s.source)}`:""}</div>
+    <div class="actions">
+      <a class="open" href="${esc(s.link)}" target="_blank" rel="noopener noreferrer">Open the score</a>
+      ${DB&&!s.reported?`<button class="btn ghost" data-report="${esc(s.id)}">Report a problem</button>`:""}
+      ${DB&&mine?(del?`<span class="note">Remove this score for everyone?</span><button class="btn warn" data-del="${esc(s.id)}">Remove</button><button class="btn ghost" data-cancel="1">Keep</button>`:`<button class="btn ghost" data-askdel="${esc(s.id)}">Remove</button>`):""}
+    </div></div>`;
+}
+$("#list").addEventListener("click",async e=>{
+  const o=e.target.closest("[data-open]");
+  if(o){const id=o.dataset.open;openId=openId===id&&!o.dataset.jump?null:id;renderList();if(o.dataset.jump){const el=document.querySelector(`[data-open="${CSS.escape(id)}"].head`);el&&el.scrollIntoView({block:"start",behavior:"smooth"})}return}
+  const a=e.target.closest("[data-addfor]");
+  if(a){const g=groups().find(x=>x.id===a.dataset.addfor);if(g)prefill(g);return}
+  const r=e.target.closest("[data-report]");
+  if(r){r.disabled=true;try{await API.report(r.dataset.report);await loadAll()}catch(err){r.disabled=false;r.textContent="Couldn't report. Try again."}return}
+  const ad=e.target.closest("[data-askdel]");if(ad){confirmDel=ad.dataset.askdel;renderList();return}
+  if(e.target.closest("[data-cancel]")){confirmDel=null;renderList();return}
+  const d=e.target.closest("[data-del]");
+  if(d){d.disabled=true;try{await API.delScore(d.dataset.del);confirmDel=null;await loadAll()}catch(err){d.textContent="Couldn't remove"}return}
+});
+$("#q").addEventListener("input",()=>{openId=null;renderList()});
+$("#fm").addEventListener("change",()=>{openId=null;renderList()});
+document.querySelectorAll("[data-show]").forEach(b=>b.addEventListener("click",()=>{showOnly=b.dataset.show;document.querySelectorAll("[data-show]").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderList()}));
+
+/* ---------- meter finder ---------- */
+let adjust={};let lastLines=[];let typedMeter="";
+function analyse(){
+  if(typedMeter){const arr=expand(typedMeter);return {arr,lines:[]}}
+  const block=($("#words").value.split(/\n\s*\n/).find(b=>b.trim())||"");
+  const lines=block.split("\n").map(l=>l.trim()).filter(Boolean);
+  if(lines.join("|")!==lastLines.join("|")){
+    const keep={};lines.forEach((l,i)=>{if(lastLines[i]===l&&adjust[i]!=null)keep[i]=adjust[i]});adjust=keep;lastLines=lines;
+  }
+  const counts=lines.map((l,i)=>adjust[i]!=null?adjust[i]:lineSyl(l));
+  return {arr:counts.length?counts:null,lines};
+}
+function renderMeter(){
+  const {arr,lines}=analyse();
+  $("#lines").innerHTML=lines.map((l,i)=>`<div class="ln"><span class="txt">${esc(l)}</span><span class="adj"><button aria-label="One fewer syllable" data-d="-1" data-i="${i}">−</button><b class="${adjust[i]!=null?"edited":""}">${adjust[i]!=null?adjust[i]:lineSyl(l)}</b><button aria-label="One more syllable" data-d="1" data-i="${i}">+</button></span></div>`).join("");
+  if(!arr){$("#verdict").innerHTML=`<div class="note">Paste a stanza or type a meter to see matching tunes.</div>`;$("#matches").innerHTML="";return}
+  const nm=shortName(arr);
+  $("#verdict").innerHTML=`<div class="note">${typedMeter?"Meter":"This stanza is in"}</div><div class="big">${esc(label(arr))}</div>${nm?`<div class="name">${esc(nm)}</div>`:""}`;
+  const all=groups().filter(g=>g.arr);
+  const key=arr.join(".");
+  const exact=all.filter(g=>g.key===key);
+  const half=arr.length%2===0?arr.slice(0,arr.length/2).join("."):null;
+  const halfOK=half&&arr.slice(arr.length/2).join(".")===half;
+  const asHalf=halfOK?all.filter(g=>g.key===half):[];
+  const dbl=arr.concat(arr).join(".");
+  const asDouble=all.filter(g=>g.key===dbl);
+  const near=all.filter(g=>{if(g.arr.length!==arr.length||g.key===key)return false;let d=0;for(let i=0;i<arr.length;i++){const x=Math.abs(g.arr[i]-arr[i]);if(x>1)return false;d+=x}return d===1});
+  const sec=(title,list,note)=>list.length?`<h2 class="sub">${title}</h2>${note?`<p class="note">${note}</p>`:""}<div class="list">${list.map(g=>`<div class="row"><button class="head" data-goto="${esc(g.id)}"><span class="tn">${esc(g.name)}${g.scores.length?`<span class="pill">${g.scores.length} score${g.scores.length>1?"s":""}</span>`:""}</span><span class="mtr">${esc(g.meter)}</span><span class="fl">${esc(g.text||"")}</span><span class="by" style="text-align:right">${esc(g.stress||g.note||"")}</span><span class="by" style="grid-column:1/-1">${esc(g.by)}</span></button></div>`).join("")}</div>`:"";
+  const stressNote=exact.some(g=>g.stress==="iambic")&&exact.some(g=>g.stress==="trochaic")?"Some of these tunes stress the first syllable of each line (trochaic) and some the second (iambic). Pick one whose stress matches your words.":"";
+  let h=sec(`${exact.length} tune${exact.length===1?"":"s"} in ${esc(label(arr))}`,exact,stressNote);
+  if(!exact.length) h=`<h2 class="sub">No tune in the index has exactly this meter</h2><p class="note">Check the syllable counts above, or look at the close matches below.</p>`;
+  h+=sec("Also fits, one tune per two half-stanzas",asHalf,"Your stanza is a doubled meter. These single-length tunes take it if you sing the tune twice per stanza.");
+  h+=sec("Also fits, two stanzas per tune",asDouble,"These double-length tunes take two of your stanzas each time through.");
+  h+=sec("Close matches",near,"One line differs by a single syllable. These can work with a slur or an elision, but sing them through first.");
+  $("#matches").innerHTML=h;
+}
+$("#words").addEventListener("input",()=>{typedMeter="";$("#mtype").value="";renderMeter()});
+$("#mtype").addEventListener("input",e=>{typedMeter=e.target.value.trim();renderMeter()});
+$("#lines").addEventListener("click",e=>{const b=e.target.closest("[data-d]");if(!b)return;const i=+b.dataset.i;const cur=adjust[i]!=null?adjust[i]:lineSyl(lastLines[i]);const nv=Math.max(1,cur+ +b.dataset.d);adjust[i]=nv===lineSyl(lastLines[i])?undefined:nv;if(adjust[i]===undefined)delete adjust[i];renderMeter()});
+$("#matches").addEventListener("click",e=>{const b=e.target.closest("[data-goto]");if(!b)return;openId=b.dataset.goto;$("#q").value="";$("#fm").value="";showOnly="all";document.querySelectorAll("[data-show]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.show==="all"?"true":"false"));setTab("lib");renderList();const el=document.querySelector(`.head[data-open="${CSS.escape(openId)}"]`);el&&el.scrollIntoView({block:"start"})});
+
+/* ---------- add a score ---------- */
+function prefill(g){
+  setTab("add");
+  $("#f-tune").value=g.community?"":g.name;
+  if(g.arr)$("#f-meter").value=g.meter.replace(/\s*\(.*\)$/,"");
+  if(g.text&&!$("#f-first").value)$("#f-first").value=g.text;
+  if(!g.community&&!$("#f-comp").value)$("#f-comp").value=g.by;
+  $("#f-title").focus();
+}
+$("#f-tune").addEventListener("change",()=>{const t=INDEX.find(x=>norm(x.name)===norm($("#f-tune").value));if(t&&!$("#f-meter").value)$("#f-meter").value=t.meter.replace(/\s*\(.*\)$/,"")});
+function gate(){
+  const g=$("#addGate");
+  if(!DB){g.innerHTML=`<div class="empty">Adding scores isn't available until the library is online. You can still search the tune index and use the meter finder.</div>`;$("#addForm").hidden=true;return}
+  g.innerHTML="";$("#addForm").hidden=false;
+}
+function showMsg(kind,t){const m=$("#formMsg");m.className="msg "+kind;m.textContent=t;m.hidden=false}
+$("#addForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const v=id=>$(id).value.trim();
+  const rights=(document.querySelector('input[name=rights]:checked')||{}).value;
+  if(!v("#f-title")){showMsg("err","Add a title so others can find the score.");$("#f-title").focus();return}
+  if(!/^https:\/\/\S+\.\S+/.test(v("#f-link"))){showMsg("err","Paste a link that starts with https:// and that anyone can open.");$("#f-link").focus();return}
+  if(!rights){showMsg("err","Choose who owns the rights. Only share scores that are public domain, your own, or shared with permission.");return}
+  let meterKey="";
+  if(v("#f-meter")){const a=expand(v("#f-meter"));if(!a){showMsg("err","That meter couldn't be read. Write it like 8.7.8.7 or CM, or leave it blank.");$("#f-meter").focus();return}meterKey=a.join(".")}
+  const doc={title:v("#f-title"),kind:$("#f-kind").value,firstLine:v("#f-first"),tune:v("#f-tune"),composer:v("#f-comp"),meter:v("#f-meter"),meterKey,key:v("#f-key"),hymnal:v("#f-hymnal"),link:v("#f-link"),rights};
+  $("#f-submit").disabled=true;
+  try{
+    await API.addScore(doc);await loadAll();
+    showMsg("ok",`Added “${doc.title}”. It now shows in the library.`);
+    $("#addForm").reset();
+  }catch(err){
+    showMsg("err",err&&err.message&&err.status===400?err.message:"The score wasn't saved. Check your connection and try again.");
+  }finally{$("#f-submit").disabled=false}
+});
+
+/* ---------- organists ---------- */
+let ORGS=[];let oSunday="";let oTarget={mode:"self",id:null};let oAvail=new Set();let oDirty=false;let oConfirm=null;let DBREADY=false;
+const pad=n=>String(n).padStart(2,"0");
+const isoDay=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function sundays(n){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+((7-d.getDay())%7));const out=[];for(let i=0;i<n;i++){out.push(isoDay(d));d.setDate(d.getDate()+7)}return out}
+function dayLabel(s){const [y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}
+const SUN=sundays(10);
+function waLink(p){const raw=String(p||"").trim();if(!/^(\+|00)/.test(raw))return "";const dg=raw.replace(/\D/g,"").replace(/^00/,"");return dg.length>=8?"https://wa.me/"+dg:""}
+function renderSundayChips(){$("#sundays").innerHTML=`<button class="chip" data-sun="" aria-pressed="${oSunday===""}">Any Sunday</button>`+SUN.slice(0,8).map(s=>`<button class="chip" data-sun="${s}" aria-pressed="${oSunday===s}">${esc(dayLabel(s))}</button>`).join("")}
+function renderAvail(){$("#oavail").innerHTML=SUN.map(s=>`<button type="button" class="chip" data-av="${s}" aria-pressed="${oAvail.has(s)}">${esc(dayLabel(s))}</button>`).join("")}
+function renderOrgs(){
+  if(!DBREADY){$("#olist").innerHTML=`<div class="empty">Loading the directory…</div>`;$("#ocnt").textContent="";return}
+  if(!DB){$("#olist").innerHTML=`<div class="empty">The organist directory needs a connection. Check your data and try again.</div>`;$("#ocnt").textContent="";return}
+  const q=$("#oq").value.trim().toLowerCase();
+  let rows=ORGS.slice();
+  if(q) rows=rows.filter(o=>q.split(/\s+/).every(w=>[o.name,(o.churches||[]).join(" "),o.town,o.denom,(o.plays||[]).join(" "),o.note].join(" ").toLowerCase().includes(w)));
+  if(oSunday) rows=rows.filter(o=>(o.available||[]).includes(oSunday));
+  rows.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  $("#ocnt").textContent=ORGS.length?(oSunday?`${rows.length} organist${rows.length===1?"":"s"} free on ${dayLabel(oSunday)}`:`${rows.length} organist${rows.length===1?"":"s"}`):"";
+  if(!ORGS.length){$("#olist").innerHTML=`<div class="empty">No organists listed yet. Add your listing below, then send this page to the organists you know so they can add theirs.</div>`;return}
+  if(!rows.length){$("#olist").innerHTML=`<div class="empty">${oSunday?`Nobody has marked ${esc(dayLabel(oSunday))} as free${q?" in this search":""}. Try another Sunday, or search by church and contact the organist directly.`:"No organist matches that search. Try a church name, town or denomination."}</div>`;return}
+  $("#olist").innerHTML=rows.map(orgCard).join("");
+}
+function orgCard(o){
+  const up=(o.available||[]).filter(d=>d>=SUN[0]).sort();
+  const mine=!!ME&&o.id===ME;const canEdit=mine||OWNER;
+  const wa=o.whatsapp?waLink(o.phone):"";
+  const del=oConfirm===o.id;
+  return `<article class="org">
+    <div class="on">${esc(o.name)}${mine?`<span class="pill">You</span>`:""}</div>
+    <div class="ch">${(o.churches||[]).map(esc).join("<br>")}</div>
+    ${[o.town,o.denom].filter(Boolean).length?`<div class="meta">${[o.town,o.denom].filter(Boolean).map(esc).join(" · ")}</div>`:""}
+    ${(o.plays||[]).length?`<div class="meta">Plays ${o.plays.map(esc).join(", ").toLowerCase()}</div>`:""}
+    <div><div class="lbl">Free on</div>${up.length?`<div class="dates">${up.slice(0,8).map(d=>`<span class="dt${d===oSunday?" sel":""}">${esc(dayLabel(d))}</span>`).join("")}</div>`:`<div class="meta">No Sundays marked. Ask directly.</div>`}</div>
+    ${o.note?`<div class="onote">${esc(o.note)}</div>`:""}
+    <div class="contact">
+      <div class="cline"><span class="lbl">Phone</span><span class="val">${esc(o.phone)}</span><button class="link" data-copy="${esc(o.phone)}">Copy</button></div>
+      ${o.email?`<div class="cline"><span class="lbl">Email</span><span class="val">${esc(o.email)}</span><button class="link" data-copy="${esc(o.email)}">Copy</button></div>`:""}
+      ${wa?`<a class="open" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>`:""}
+    </div>
+    ${canEdit?`<div class="actions">${mine?"":`<button class="btn ghost" data-oedit="${esc(o.id)}">Edit</button>`}${del?`<span class="note">Remove this listing?</span><button class="btn warn" data-odel="${esc(o.id)}">Remove</button><button class="btn ghost" data-ocancel="1">Keep</button>`:`<button class="btn ghost" data-oask="${esc(o.id)}">Remove listing</button>`}</div>`:""}
+  </article>`;
+}
+function fillForm(o){
+  $("#o-name").value=o?.name||"";$("#o-town").value=o?.town||"";$("#o-phone").value=o?.phone||"";$("#o-email").value=o?.email||"";
+  $("#o-churches").value=(o?.churches||[]).join(", ");$("#o-denom").value=o?.denom||"";$("#o-note").value=o?.note||"";
+  $("#o-wa").checked=!!o?.whatsapp;
+  document.querySelectorAll("#o-plays input").forEach(c=>c.checked=(o?.plays||[]).includes(c.value));
+  oAvail=new Set((o?.available||[]).filter(d=>d>=SUN[0]));renderAvail();
+  $("#o-consent").checked=!!o;$("#oMsg").hidden=true;oDirty=false;
+}
+function setMode(mode,id){
+  oTarget={mode,id:mode==="self"?ME:(id||null)};
+  document.querySelectorAll("[data-omode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.omode===mode?"true":"false"));
+  $("#me-h").textContent=mode==="self"?"Your listing":(id?"Edit a listing":"Add another organist");
+  $("#consent-t").textContent=mode==="self"?"I agree to show my name, churches and contact details to everyone who can open this page.":"This organist agreed to be listed here with these contact details.";
+  $("#o-submit").textContent=mode==="self"?"Save listing":"Save their listing";
+  fillForm(mode==="self"?ORGS.find(o=>o.id===ME):(id?ORGS.find(o=>o.id===id):null));
+}
+function orgGate(){
+  const g=$("#orgGate");
+  if(!DBREADY){g.innerHTML="";$("#orgForm").hidden=true;return}
+  if(!DB){g.innerHTML=`<div class="empty">Listing yourself needs a connection. Check your data and try again.</div>`;$("#orgForm").hidden=true;return}
+  g.innerHTML="";$("#orgForm").hidden=false;$("#omode").hidden=!OWNER;
+}
+function oShow(kind,t){const m=$("#oMsg");m.className="msg "+kind;m.textContent=t;m.hidden=false}
+$("#oq").addEventListener("input",renderOrgs);
+$("#sundays").addEventListener("click",e=>{const b=e.target.closest("[data-sun]");if(!b)return;oSunday=b.dataset.sun;renderSundayChips();renderOrgs()});
+$("#oavail").addEventListener("click",e=>{const b=e.target.closest("[data-av]");if(!b)return;const d=b.dataset.av;oAvail.has(d)?oAvail.delete(d):oAvail.add(d);oDirty=true;renderAvail()});
+$("#omode").addEventListener("click",e=>{const b=e.target.closest("[data-omode]");if(b)setMode(b.dataset.omode)});
+$("#orgForm").addEventListener("input",()=>{oDirty=true});
+$("#olist").addEventListener("click",async e=>{
+  const c=e.target.closest("[data-copy]");
+  if(c){try{await navigator.clipboard.writeText(c.dataset.copy);c.textContent="Copied"}catch(err){const v=c.previousElementSibling;const r=document.createRange();r.selectNodeContents(v);const s=getSelection();s.removeAllRanges();s.addRange(r);c.textContent="Selected"}setTimeout(()=>{c.textContent="Copy"},1600);return}
+  const ed=e.target.closest("[data-oedit]");if(ed){setMode("other",ed.dataset.oedit);$("#me-h").scrollIntoView({block:"start",behavior:"smooth"});return}
+  const a=e.target.closest("[data-oask]");if(a){oConfirm=a.dataset.oask;renderOrgs();return}
+  if(e.target.closest("[data-ocancel]")){oConfirm=null;renderOrgs();return}
+  const d=e.target.closest("[data-odel]");
+  if(d){d.disabled=true;const id=d.dataset.odel;try{await API.delOrganist(id);oConfirm=null;if(id===ME){ME=null;saveMe(null)}await loadAll();if(oTarget.id===id||oTarget.mode==="self")setMode("self")}catch(err){d.disabled=false;d.textContent="Couldn't remove"}}
+});
+$("#orgForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const v=id=>$(id).value.trim();
+  const churches=v("#o-churches").split(",").map(s=>s.trim()).filter(Boolean);
+  if(!v("#o-name")){oShow("err","Add a name so others know who to ask for.");$("#o-name").focus();return}
+  if(v("#o-phone").replace(/\D/g,"").length<7){oShow("err","Add a phone number with at least 7 digits, including the country code.");$("#o-phone").focus();return}
+  if(v("#o-email")&&!/^\S+@\S+\.\S+$/.test(v("#o-email"))){oShow("err","That email address looks incomplete. Fix it or leave it blank.");$("#o-email").focus();return}
+  if(!churches.length){oShow("err","Add at least one church, so organists can search by church.");$("#o-churches").focus();return}
+  if(!$("#o-consent").checked){oShow("err",oTarget.mode==="self"?"Tick the box to agree to show your details. The directory only lists people who agree.":"Only list someone who agreed to share their contact details. Tick the box to confirm they did.");return}
+  const id=oTarget.mode==="self"?ME:oTarget.id;
+  const doc={name:v("#o-name"),phone:v("#o-phone"),whatsapp:$("#o-wa").checked,email:v("#o-email"),churches,town:v("#o-town"),denom:v("#o-denom"),
+    plays:[...document.querySelectorAll("#o-plays input:checked")].map(c=>c.value),note:v("#o-note"),available:[...oAvail].sort(),consent:true,updatedAt:Date.now()};
+  $("#o-submit").disabled=true;
+  try{
+    const res=await API.saveOrganist(id,doc);
+    if(oTarget.mode==="self"&&!id){ME=res.id;saveMe(res.id,res.editKey)}
+    oTarget.id=res.id;oDirty=false;await loadAll();
+    if(oTarget.mode==="other")$("#me-h").textContent="Edit a listing";
+    oShow("ok",oTarget.mode==="self"?"Saved. Your listing is in the directory.":`Saved ${doc.name}'s listing. Choose “Add another organist” to start a new one.`);
+  }catch(err){
+    oShow("err",err&&err.status===400&&err.message?err.message:"The listing wasn't saved. Check your connection and try again.");
+  }finally{$("#o-submit").disabled=false}
+});
+
+/* ---------- boot ---------- */
+meterOptions();renderList();renderMeter();gate();
+renderSundayChips();renderAvail();renderOrgs();orgGate();
+try{const t=localStorage.getItem("olTab");if(t&&["lib","meter","org","add"].includes(t))setTab(t)}catch(e){}
+/* ---------- app data layer (Salone Organ Loft server) ---------- */
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function lsSet(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function ownScores(){return lsGet("olOwnScores",{})}
+function saveMe(id,key){if(!id){lsSet("olMe",null);return}lsSet("olMe",{id,key})}
+function myKeyFor(id){const me=lsGet("olMe",null);if(me&&me.id===id)return me.key;return ownScores()[id]||""}
+let ADMIN_PIN=lsGet("olAdmin","");
+async function call(path,opt={}){
+  const headers={"content-type":"application/json"};
+  if(ADMIN_PIN)headers["x-admin-pin"]=ADMIN_PIN;
+  if(opt.key)headers["x-edit-key"]=opt.key;
+  const r=await fetch(path,{method:opt.method||"GET",headers,body:opt.body?JSON.stringify(opt.body):undefined});
+  let data=null;try{data=await r.json()}catch(e){}
+  if(!r.ok){const err=new Error((data&&data.error)||"Request failed");err.status=r.status;err.code=data&&data.code;throw err}
+  return data;
+}
+const API={
+  scores:()=>call("/api/scores"),
+  organists:()=>call("/api/organists"),
+  addScore:async doc=>{const r=await call("/api/scores",{method:"POST",body:doc});const o=ownScores();o[r.id]=r.editKey;lsSet("olOwnScores",o);return r},
+  report:id=>call("/api/scores?id="+encodeURIComponent(id)+"&action=report",{method:"POST"}),
+  delScore:id=>call("/api/scores?id="+encodeURIComponent(id),{method:"DELETE",key:myKeyFor(id)}),
+  saveOrganist:(id,doc)=>id?call("/api/organists?id="+encodeURIComponent(id),{method:"PUT",body:doc,key:myKeyFor(id)}).then(()=>({id})):call("/api/organists",{method:"POST",body:doc}),
+  delOrganist:id=>call("/api/organists?id="+encodeURIComponent(id),{method:"DELETE",key:myKeyFor(id)}),
+  checkAdmin:pin=>fetch("/api/admin",{headers:{"x-admin-pin":pin}}).then(r=>r.ok)
+};
+function banner(msg){const b=$("#banner");if(!msg){b.hidden=true;return}b.textContent=msg;b.hidden=false}
+async function loadAll(){
+  try{
+    const [sc,og]=await Promise.all([API.scores(),API.organists()]);
+    SCORES=sc.scores||[];ORGS=og.organists||[];DB=API;banner("");
+    try{localStorage.setItem("olCache",JSON.stringify({SCORES,ORGS,at:Date.now()}))}catch(e){}
+  }catch(err){
+    const c=lsGet("olCache",null);
+    if(c){SCORES=c.SCORES||[];ORGS=c.ORGS||[]}
+    if(err.status===503)banner("The library database isn't connected yet. The tune index and meter finder still work.");
+    else banner(c?"You're offline. Showing the scores and organists saved on this phone.":"Can't reach the library right now. The tune index and meter finder still work offline.");
+    DB=err.status?null:(c?null:null);
+  }
+  DBREADY=true;
+  meterOptions();renderList();renderMeter();gate();orgGate();
+  if(!oDirty) fillForm(oTarget.mode==="self"?ORGS.find(o=>o.id===ME):(oTarget.id?ORGS.find(o=>o.id===oTarget.id):null));
+  renderOrgs();
+}
+(async()=>{
+  const me=lsGet("olMe",null);ME=me&&me.id||null;OWNER=!!ADMIN_PIN;
+  oTarget={mode:"self",id:ME};
+  await loadAll();
+  setMode("self");
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&!oDirty)loadAll()});
+  /* admin */
+  const syncAdmin=()=>{$("#adminToggle").textContent=OWNER?"Admin mode is on · Turn off":"Admin";$("#omode").hidden=!OWNER};
+  syncAdmin();
+  $("#adminToggle").addEventListener("click",()=>{
+    if(OWNER){ADMIN_PIN="";OWNER=false;lsSet("olAdmin",null);syncAdmin();setMode("self");renderList();renderOrgs();return}
+    $("#adminBar").hidden=!$("#adminBar").hidden;if(!$("#adminBar").hidden)$("#adminPin").focus();
+  });
+  $("#adminGo").addEventListener("click",async()=>{
+    const pin=$("#adminPin").value.trim();if(!pin)return;
+    $("#adminMsg").textContent="Checking…";
+    let ok=false;try{ok=await API.checkAdmin(pin)}catch(e){}
+    if(!ok){$("#adminMsg").textContent="That PIN didn't work.";return}
+    ADMIN_PIN=pin;OWNER=true;lsSet("olAdmin",pin);$("#adminPin").value="";$("#adminMsg").textContent="";$("#adminBar").hidden=true;
+    syncAdmin();renderList();renderOrgs();
+  });
+  /* install */
+  let deferred=null;const tip=$("#installTip");
+  const standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;if(standalone)return;
+    tip.innerHTML='Put Salone Organ Loft on your home screen. <button class="btn" type="button" id="installBtn" style="margin-left:8px">Install</button>';tip.hidden=false;
+    $("#installBtn").addEventListener("click",async()=>{tip.hidden=true;deferred.prompt();deferred=null});
+  });
+  if(!standalone&&/iphone|ipad/i.test(navigator.userAgent)&&!lsGet("olIosTip",false)){
+    tip.textContent="On iPhone: tap Share, then “Add to Home Screen” to install Salone Organ Loft.";tip.hidden=false;lsSet("olIosTip",true);
+  }
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+})();
+
+</script>
+</body>
+</html>
