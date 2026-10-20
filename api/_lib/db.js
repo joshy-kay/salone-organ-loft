@@ -25,6 +25,7 @@ async function setup() {
     email text default '', churches jsonb default '[]', town text default '', denom text default '',
     plays jsonb default '[]', note text default '', available jsonb default '[]',
     updated_at bigint not null, edit_hash text)`;
+  await sql`alter table scores add column if not exists pages jsonb default '[]'`;
   const [{ n }] = await sql`select count(*)::int as n from scores`;
   if (n === 0) {
     await sql(`insert into scores (id,title,kind,first_line,tune,composer,meter,meter_key,key,hymnal,link,rights,source,notes,created_at)
@@ -72,3 +73,5 @@ export function fail(res, err) {
   send(res, status, { error: status === 500 ? "Something went wrong on the server." : err.message, code: err.code || null });
 }
 export function bad(msg) { const e = new Error(msg); e.status = 400; return e; }
+
+export const BLOB_HOST = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//i;

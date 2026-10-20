@@ -98,7 +98,7 @@ button.link{all:unset;cursor:pointer;color:var(--cloth);font-size:.88rem;text-de
 form{display:grid;gap:14px}
 label{display:grid;gap:4px;font-weight:500;font-size:.92rem}
 label span.h{font-weight:400;color:var(--muted);font-size:.84rem}
-fieldset{border:1px solid var(--rule);border-radius:8px;padding:10px 14px;display:grid;gap:6px}
+fieldset{min-width:0;border:1px solid var(--rule);border-radius:8px;padding:10px 14px;display:grid;gap:6px}
 legend{font-weight:500;font-size:.92rem;padding:0 4px}
 .radio{display:flex;gap:8px;align-items:flex-start;font-weight:400}
 .radio input{margin-top:4px}
@@ -127,6 +127,13 @@ legend{font-weight:500;font-size:.92rem;padding:0 4px}
 .cline .val{font:500 .98rem var(--mono);user-select:all;overflow-wrap:anywhere;min-width:0}
 .checks{display:flex;gap:6px 16px;flex-wrap:wrap}
 .checks label{display:flex;gap:6px;align-items:center;font-weight:400}
+.filedrop{display:grid;gap:4px;border:1px dashed var(--cloth);border-radius:8px;padding:14px;background:var(--leaf);cursor:pointer;margin-top:8px}
+.filedrop .fd-t{font-weight:700;color:var(--cloth)}
+.filedrop input{margin-top:6px;font:inherit;color:var(--ink);max-width:100%}
+.flist{margin:8px 0 0;padding-left:1.4em;display:grid;gap:4px;font-size:.9rem}
+.flist .sz{color:var(--muted);font-variant-numeric:tabular-nums}
+.thumb{display:block;max-width:180px;max-height:240px;border:1px solid var(--rule);border-radius:4px;background:#fff}
+.pages{display:flex;gap:6px;flex-wrap:wrap}
 .formhead{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;justify-content:space-between}
 @media (prefers-reduced-motion:no-preference){.detail{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(-3px)}to{opacity:1;transform:none}}}
 </style>
@@ -256,7 +263,24 @@ And our eternal home.</textarea>
       <label for="f-key">Key<input type="text" id="f-key" placeholder="e.g. F major"></label>
       <label for="f-hymnal">Source hymnal and number<input type="text" id="f-hymnal" placeholder="e.g. Hymns Ancient &amp; Modern 165"></label>
     </div>
-    <label for="f-link">Link to the file<span class="h">A public link to the PDF or photo, from Google Drive, Dropbox, OneDrive or similar. Set it so anyone with the link can view.</span><input type="url" id="f-link" placeholder="https://" required></label>
+    <fieldset>
+      <legend>The score</legend>
+      <div class="chips" role="group" aria-label="How to add the score">
+        <button type="button" class="chip" data-src="file" aria-pressed="true">Upload PDF or photos</button>
+        <button type="button" class="chip" data-src="link" aria-pressed="false">Paste a link</button>
+      </div>
+      <div id="src-file">
+        <label for="f-files" class="filedrop">
+          <span class="fd-t">Choose a PDF, or photos of each page</span>
+          <span class="h">PDF up to 4 MB, or up to 8 photos (JPG, PNG). Photos are shrunk on your phone before uploading, to save data.</span>
+          <input type="file" id="f-files" accept="application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png" multiple>
+        </label>
+        <ol class="flist" id="f-list" hidden></ol>
+      </div>
+      <div id="src-link" hidden>
+        <label for="f-link">Link to the file<span class="h">A public link from Google Drive, Dropbox, OneDrive or similar. Set it so anyone with the link can view.</span><input type="url" id="f-link" placeholder="https://"></label>
+      </div>
+    </fieldset>
     <fieldset>
       <legend>Who owns the rights to this score?</legend>
       <label class="radio"><input type="radio" name="rights" value="Public domain"> Public domain (old enough that copyright has expired)</label>
@@ -569,9 +593,10 @@ function scoreHTML(s){
     <div class="t">${esc(s.title)} <span class="pill">${esc(s.kind||"Hymn")}</span>${s.reported?`<span class="pill flag">Flagged for review</span>`:""}</div>
     <div class="meta">${[s.composer,s.key,s.hymnal,s.meter?label(expand(s.meter)||[])||s.meter:""].filter(Boolean).map(esc).join(" · ")}</div>
     ${s.notes?`<div class="meta">${esc(s.notes)}</div>`:""}
+    ${(s.pages||[]).length&&!/\.pdf$/i.test(s.pages[0])?`<a href="${esc(s.pages[0])}" target="_blank" rel="noopener noreferrer"><img class="thumb" src="${esc(s.pages[0])}" alt="First page of ${esc(s.title)}" loading="lazy"></a>`:""}
     <div class="meta">Rights: ${esc(s.rights)}${s.source?` · Source: ${esc(s.source)}`:""}</div>
     <div class="actions">
-      <a class="open" href="${esc(s.link)}" target="_blank" rel="noopener noreferrer">Open the score</a>
+      ${(s.pages||[]).length>1?`<span class="pages">${s.pages.map((u,i)=>`<a class="open" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Page ${i+1}</a>`).join("")}</span>`:`<a class="open" href="${esc(s.link)}" target="_blank" rel="noopener noreferrer">Open the score</a>`}
       ${DB&&!s.reported?`<button class="btn ghost" data-report="${esc(s.id)}">Report a problem</button>`:""}
       ${DB&&mine?(del?`<span class="note">Remove this score for everyone?</span><button class="btn warn" data-del="${esc(s.id)}">Remove</button><button class="btn ghost" data-cancel="1">Keep</button>`:`<button class="btn ghost" data-askdel="${esc(s.id)}">Remove</button>`):""}
     </div></div>`;
@@ -654,20 +679,61 @@ $("#addForm").addEventListener("submit",async e=>{
   const v=id=>$(id).value.trim();
   const rights=(document.querySelector('input[name=rights]:checked')||{}).value;
   if(!v("#f-title")){showMsg("err","Add a title so others can find the score.");$("#f-title").focus();return}
-  if(!/^https:\/\/\S+\.\S+/.test(v("#f-link"))){showMsg("err","Paste a link that starts with https:// and that anyone can open.");$("#f-link").focus();return}
+  const useFile=srcMode==="file";
+  if(useFile&&!pickedFiles.length){showMsg("err","Choose the PDF or photos of the score, or switch to “Paste a link”.");return}
+  if(!useFile&&!/^https:\/\/\S+\.\S+/.test(v("#f-link"))){showMsg("err","Paste a link that starts with https:// and that anyone can open.");$("#f-link").focus();return}
+  const fileErr=useFile?checkFiles(pickedFiles):"";if(fileErr){showMsg("err",fileErr);return}
   if(!rights){showMsg("err","Choose who owns the rights. Only share scores that are public domain, your own, or shared with permission.");return}
   let meterKey="";
   if(v("#f-meter")){const a=expand(v("#f-meter"));if(!a){showMsg("err","That meter couldn't be read. Write it like 8.7.8.7 or CM, or leave it blank.");$("#f-meter").focus();return}meterKey=a.join(".")}
-  const doc={title:v("#f-title"),kind:$("#f-kind").value,firstLine:v("#f-first"),tune:v("#f-tune"),composer:v("#f-comp"),meter:v("#f-meter"),meterKey,key:v("#f-key"),hymnal:v("#f-hymnal"),link:v("#f-link"),rights};
+  const doc={title:v("#f-title"),kind:$("#f-kind").value,firstLine:v("#f-first"),tune:v("#f-tune"),composer:v("#f-comp"),meter:v("#f-meter"),meterKey,key:v("#f-key"),hymnal:v("#f-hymnal"),link:useFile?"":v("#f-link"),rights};
   $("#f-submit").disabled=true;
   try{
+    if(useFile){doc.pages=[];for(let i=0;i<pickedFiles.length;i++){showMsg("ok",`Uploading ${pickedFiles.length>1?`page ${i+1} of ${pickedFiles.length}`:"the file"}…`);doc.pages.push(await uploadFile(pickedFiles[i]))}}
     await API.addScore(doc);await loadAll();
     showMsg("ok",`Added “${doc.title}”. It now shows in the library.`);
-    $("#addForm").reset();
+    $("#addForm").reset();pickedFiles=[];renderPicked();
   }catch(err){
     showMsg("err",err&&err.message&&err.status===400?err.message:"The score wasn't saved. Check your connection and try again.");
   }finally{$("#f-submit").disabled=false}
 });
+
+/* ---------- file uploads ---------- */
+let srcMode="file";let pickedFiles=[];
+const MAXB=4*1024*1024;
+const fmtSize=n=>n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
+const isPdf=f=>f.type==="application/pdf"||/\.pdf$/i.test(f.name);
+document.querySelectorAll("[data-src]").forEach(b=>b.addEventListener("click",()=>{srcMode=b.dataset.src;document.querySelectorAll("[data-src]").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));$("#src-file").hidden=srcMode!=="file";$("#src-link").hidden=srcMode!=="link"}));
+function renderPicked(){const l=$("#f-list");if(!pickedFiles.length){l.hidden=true;l.innerHTML="";return}l.hidden=false;l.innerHTML=pickedFiles.map(f=>`<li>${esc(f.name)} <span class="sz">${fmtSize(f.size)}</span></li>`).join("")}
+$("#f-files").addEventListener("change",e=>{pickedFiles=[...e.target.files];renderPicked();$("#formMsg").hidden=true});
+function checkFiles(fs){
+  const pdfs=fs.filter(isPdf);
+  if(pdfs.length&&fs.length>1)return "Upload one PDF on its own, or photos only. Not both together.";
+  if(pdfs.length&&pdfs[0].size>MAXB)return "That PDF is larger than 4 MB. Save a smaller copy, or share a link instead.";
+  if(fs.length>8)return "Choose up to 8 photos for one score.";
+  if(fs.some(f=>!isPdf(f)&&!/^image\/(jpeg|png|webp)$/.test(f.type)&&!/\.(jpe?g|png|webp)$/i.test(f.name)))return "Only PDF, JPG, PNG or WebP files can be uploaded.";
+  return "";
+}
+async function shrink(file){
+  if(isPdf(file))return file;
+  try{
+    const bmp=await createImageBitmap(file,{imageOrientation:"from-image"});
+    const scale=Math.min(1,2000/Math.max(bmp.width,bmp.height));
+    const c=document.createElement("canvas");c.width=Math.round(bmp.width*scale);c.height=Math.round(bmp.height*scale);
+    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(bmp,0,0,c.width,c.height);
+    let q=.82,b=await new Promise(r=>c.toBlob(r,"image/jpeg",q));
+    while(b&&b.size>MAXB&&q>.4){q-=.12;b=await new Promise(r=>c.toBlob(r,"image/jpeg",q))}
+    return b?new File([b],file.name.replace(/\.[^.]+$/,"")+".jpg",{type:"image/jpeg"}):file;
+  }catch(e){return file}
+}
+async function uploadFile(file){
+  const f=await shrink(file);
+  if(f.size>MAXB)throw Object.assign(new Error("A photo is still larger than 4 MB after shrinking. Try a smaller photo."),{status:400});
+  const r=await fetch("/api/upload",{method:"POST",headers:{"content-type":"application/octet-stream","x-file-name":encodeURIComponent(f.name)},body:f});
+  let d=null;try{d=await r.json()}catch(e){}
+  if(!r.ok)throw Object.assign(new Error((d&&d.error)||"The upload failed. Check your connection and try again."),{status:400});
+  return d.url;
+}
 
 /* ---------- organists ---------- */
 let ORGS=[];let oSunday="";let oTarget={mode:"self",id:null};let oAvail=new Set();let oDirty=false;let oConfirm=null;let DBREADY=false;

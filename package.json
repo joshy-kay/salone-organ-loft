@@ -2,8 +2,11 @@
   "name": "salone-organ-loft",
   "private": true,
   "type": "module",
-  "engines": { "node": "22.x" },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
-    "@neondatabase/serverless": "0.10.4"
+    "@neondatabase/serverless": "0.10.4",
+    "@vercel/blob": "2.8.0"
   }
 }
